@@ -2,8 +2,8 @@ package com.example.mobile_application_final_assignment;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
+import android.widget.Button;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -11,26 +11,30 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-public class MainActivity extends AppCompatActivity {
+public class signinscreen extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_signinscreen);
 
-        // Set padding for system bars
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
 
-        // Delay and move to login screen after 2 seconds
-        new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            Intent intent = new Intent(MainActivity.this,com.example.mobile_application_final_assignment.signinscreen.class);
+        TextView signUpLink = findViewById(R.id.textView);
+        signUpLink.setOnClickListener(v -> {
+            Intent intent = new Intent(signinscreen.this, signupscreen.class);
             startActivity(intent);
-            finish(); // Close splash screen so user can't go back to it
-        }, 2000); // 2000 milliseconds = 2 seconds
+        });
+
+        Button loginButton = findViewById(R.id.btnLogin);
+        loginButton.setOnClickListener(v -> {
+            Intent intent = new Intent(signinscreen.this, com.example.mobile_application_final_assignment.newsscreen.class);
+            startActivity(intent);
+        });
     }
 }
