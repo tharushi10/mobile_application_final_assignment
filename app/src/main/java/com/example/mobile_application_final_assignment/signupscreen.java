@@ -2,45 +2,60 @@ package com.example.mobile_application_final_assignment;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
-
-import androidx.activity.EdgeToEdge;
+import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class signupscreen extends AppCompatActivity {
+
+    EditText etUsername, etEmail, etPassword, etConfirmPassword;
+    Button btnSignUp;
+    TextView tvToLogin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_signupscreen);
 
-        // Apply window insets
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
+        etUsername = findViewById(R.id.etUsername);
+        etEmail = findViewById(R.id.etUsername);
+        etPassword = findViewById(R.id.etPassword);
+        etConfirmPassword = findViewById(R.id.etPassword);
+        btnSignUp = findViewById(R.id.btnLogin);
+        tvToLogin = findViewById(R.id.btnLogin);
+
+        btnSignUp.setOnClickListener(v -> {
+            String username = etUsername.getText().toString().trim();
+            String email = etEmail.getText().toString().trim();
+            String password = etPassword.getText().toString().trim();
+            String confirmPassword = etConfirmPassword.getText().toString().trim();
+
+            if (username.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
+                Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (!password.equals(confirmPassword)) {
+                Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference("Users");
+            userscreen newUser = new userscreen(username, password, email);
+
+            dbRef.child(username).setValue(newUser).addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    Toast.makeText(this, "Signup successful", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(this, signinscreen.class);
+                    startActivity(intent);
+                    finish();
+                } else {
+                    Toast.makeText(this, "Signup failed", Toast.LENGTH_SHORT).show();
+                }
+            });
         });
 
-        // 🔗 Navigate to login screen
-        TextView loginText = findViewById(R.id.textView);
-        loginText.setOnClickListener(v -> {
-            Intent intent = new Intent(signupscreen.this, signinscreen.class);
-            startActivity(intent);
-            finish();
-        });
-
-        // Navigate to news screen when sign-up button is clicked
-        Button signupButton = findViewById(R.id.btnLogin);
-        signupButton.setOnClickListener(v -> {
-            Intent intent = new Intent(signupscreen.this, com.example.mobile_application_final_assignment.newsscreen.class);
-            startActivity(intent);
-            finish(); // Optional: close signup screen
-        });
+        tvToLogin.setOnClickListener(v -> startActivity(new Intent(this, signinscreen.class)));
     }
 }
